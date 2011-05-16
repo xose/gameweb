@@ -28,6 +28,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -136,7 +137,7 @@ public class ChessBoardWidget extends Composite implements ClickHandler {
 
 		final ChessPiece selectedPiece = board.getPieceAt(selected);
 		if (selectedPiece != null && selectedPiece.canMove(clicked)) {
-			logger.info("Move: " + selected.toString() + " -> " + clicked.toString());
+			fireEvent(new PieceMovedEvent(selected, clicked));
 			selected = null;
 		} else if (board.isPieceAt(clicked) && !clicked.equals(selected)) {
 			selected = clicked;
@@ -152,6 +153,10 @@ public class ChessBoardWidget extends Composite implements ClickHandler {
 
 		selected = null;
 		drawBoard();
+	}
+
+	public HandlerRegistration addPieceMovedHandler(final PieceMovedEvent.Handler handler) {
+		return addHandler(handler, PieceMovedEvent.TYPE);
 	}
 
 }

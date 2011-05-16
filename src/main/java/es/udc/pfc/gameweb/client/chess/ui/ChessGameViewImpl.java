@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import es.udc.pfc.gamelib.board.Position;
 
-public class ChessGameViewImpl extends Composite implements ChessGameView {
+public class ChessGameViewImpl extends Composite implements ChessGameView, PieceMovedEvent.Handler {
 
 	private static ChessGameViewImplUiBinder uiBinder = GWT.create(ChessGameViewImplUiBinder.class);
 
@@ -43,6 +43,8 @@ public class ChessGameViewImpl extends Composite implements ChessGameView {
 
 	public ChessGameViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
+
+		chessBoard.addPieceMovedHandler(this);
 	}
 
 	@UiField
@@ -98,6 +100,11 @@ public class ChessGameViewImpl extends Composite implements ChessGameView {
 	@Override
 	public final void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+	}
+
+	@Override
+	public void onPieceMoved(final PieceMovedEvent event) {
+		presenter.movePiece(event.getFrom(), event.getTo());
 	}
 
 }

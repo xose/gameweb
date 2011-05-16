@@ -21,6 +21,8 @@ package es.udc.pfc.gameweb.client.chess.ui;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
+import es.udc.pfc.gamelib.board.Position;
+
 public interface ChessGameView extends IsWidget {
 
 	public void setPresenter(final Presenter presenter);
@@ -37,6 +39,8 @@ public interface ChessGameView extends IsWidget {
 		public void sendChat(final String text);
 
 		public void sendCommand(final String text);
+
+		public void movePiece(final Position from, final Position to);
 	}
 
 }

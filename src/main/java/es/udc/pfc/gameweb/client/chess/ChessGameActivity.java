@@ -34,6 +34,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
+import es.udc.pfc.gamelib.board.Position;
 import es.udc.pfc.gameweb.client.chess.ui.ChessGameView;
 
 public class ChessGameActivity extends AbstractActivity implements ChessGameView.Presenter {
@@ -135,6 +136,11 @@ public class ChessGameActivity extends AbstractActivity implements ChessGameView
 	@Override
 	public void sendCommand(final String text) {
 		room.sendPrivateMessage(new Message(text), "arbiter");
+	}
+
+	@Override
+	public void movePiece(final Position from, final Position to) {
+		room.sendPrivateMessage(new Message("!move " + from.toString() + " " + to.toString()), "arbiter");
 	}
 
 }
