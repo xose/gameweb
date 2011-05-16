@@ -1,0 +1,20 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:chess="urn:import:es.udc.pfc.gameweb.client.chess.ui">
+	<g:HorizontalPanel>
+		<g:VerticalPanel>
+			<chess:ChessBoardWidget ui:field="chessBoard" />
+			<g:HorizontalPanel>
+				<g:Label text="Mensaje:" width="75px" />
+				<g:TextBox ui:field="chatBox" />
+			</g:HorizontalPanel>
+			<g:HorizontalPanel>
+				<g:Label text="Comando:" width="75px" />
+				<g:TextBox ui:field="commandBox" />
+			</g:HorizontalPanel>
+			<g:Label ui:field="response" width="300px" />
+		</g:VerticalPanel>
+		<g:VerticalPanel ui:field="roomMessages" />
+	</g:HorizontalPanel>
+</ui:UiBinder> 

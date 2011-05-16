@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.2.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.2.0/distro-source/core/src/gwt-module.dtd">
+<module rename-to="GameWeb">
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.activity.Activity"/>
+  <inherits name="com.google.gwt.place.Place"/>
+  <inherits name="com.google.gwt.inject.Inject"/>
+  
+  <inherits name='com.calclab.emite.core.EmiteCore' />
+  <inherits name='com.calclab.emite.im.EmiteIM' />
+  <inherits name='com.calclab.emite.browser.EmiteBrowser' />
+  <inherits name='com.calclab.emite.reconnect.EmiteReconnect' />
+  <inherits name='com.calclab.emite.xep.muc.EmiteMUC' />
+  
+  <inherits name='es.udc.pfc.gamelib' />
+  
+  <entry-point class='es.udc.pfc.gameweb.client.GameWeb' />
+  
+  <source path='client'/>
+</module>
