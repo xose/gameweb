@@ -21,7 +21,6 @@ package es.udc.pfc.gameweb.client.chess.ui;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -39,8 +38,6 @@ import es.udc.pfc.gamelib.chess.ChessPiece;
 import es.udc.pfc.gameweb.client.chess.pieces.ChessPieces;
 
 public class ChessBoardWidget extends Composite implements ClickHandler {
-
-	private static final Logger logger = Logger.getLogger(ChessBoardWidget.class.getName());
 
 	private static final Map<String, ImageElement> pieceImages;
 
