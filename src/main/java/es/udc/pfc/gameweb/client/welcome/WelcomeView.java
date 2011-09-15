@@ -17,16 +17,16 @@
  * along with GameWeb.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package es.udc.pfc.gameweb.client;
+package es.udc.pfc.gameweb.client.welcome;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.IsWidget;
 
-public class GameWeb implements EntryPoint {
+public interface WelcomeView extends IsWidget {
 
-	@Override
-	public void onModuleLoad() {
-		GWT.create(GameGinjector.class);
+	public void setPresenter(Presenter presenter);
+
+	public interface Presenter {
+		public void playChess();
 	}
 
 }

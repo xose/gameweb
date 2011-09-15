@@ -21,13 +21,8 @@ package es.udc.pfc.gameweb.client;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
-import com.google.gwt.place.shared.PlaceHistoryHandler;
-
-import es.udc.pfc.gameweb.client.ui.MainView;
 
 @GinModules({ GameGinModule.class })
 public interface GameGinjector extends Ginjector {
-	PlaceHistoryHandler getPlaceHistoryHandler();
-
 	MainView getMainView();
 }
