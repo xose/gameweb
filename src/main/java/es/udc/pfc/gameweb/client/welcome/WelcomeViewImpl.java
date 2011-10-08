@@ -42,7 +42,7 @@ public final class WelcomeViewImpl extends Composite implements WelcomeView {
 	}
 
 	@UiHandler("playChessLink")
-	protected final void onClick(final ClickEvent e) {
+	protected final void onClick(final ClickEvent event) {
 		System.out.println("Chess click");
 		presenter.playChess();
 	}

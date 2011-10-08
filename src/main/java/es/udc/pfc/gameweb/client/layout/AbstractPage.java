@@ -16,6 +16,7 @@ public abstract class AbstractPage implements Page {
 		this.eventBus = eventBus;
 	}
 
+	@Override
 	public final String getPageTitle() {
 		return title;
 	}
@@ -26,6 +27,7 @@ public abstract class AbstractPage implements Page {
 		eventBus.fireEventFromSource(new PageStateChangedEvent(this), this);
 	}
 	
+	@Override
 	public final ImageResource getPageIcon() {
 		return icon;
 	}
@@ -36,6 +38,7 @@ public abstract class AbstractPage implements Page {
 		eventBus.fireEventFromSource(new PageStateChangedEvent(this), this);
 	}
 	
+	@Override
 	public final boolean getPageCanClose() {
 		return canClose;
 	}

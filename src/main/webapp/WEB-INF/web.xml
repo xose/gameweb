@@ -10,7 +10,7 @@
 	<servlet>
 		<servlet-name>Palladium</servlet-name>
 		<servlet-class>org.xmpp.palladium.PalladiumServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
+		<!-- <load-on-startup>1</load-on-startup> -->
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Palladium</servlet-name>

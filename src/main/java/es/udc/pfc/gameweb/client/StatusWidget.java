@@ -19,9 +19,9 @@
 
 package es.udc.pfc.gameweb.client;
 
-import com.calclab.emite.core.client.xmpp.session.SessionState;
-import com.calclab.emite.core.client.xmpp.session.SessionStateChangedEvent;
-import com.calclab.emite.core.client.xmpp.session.XmppSession;
+import com.calclab.emite.core.client.events.SessionStatusChangedEvent;
+import com.calclab.emite.core.client.session.SessionStatus;
+import com.calclab.emite.core.client.session.XmppSession;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class StatusWidget extends Composite implements SessionStateChangedEvent.Handler {
+public class StatusWidget extends Composite implements SessionStatusChangedEvent.Handler {
 
 	private final Label image = new Label("?"); // TODO: make this an image
 	private final Label status = new Label("Unknown");
@@ -48,20 +48,20 @@ public class StatusWidget extends Composite implements SessionStateChangedEvent.
 		panel.add(image);
 		panel.add(status);
 
-		session.addSessionStateChangedHandler(true, this);
+		session.addSessionStatusChangedHandler(true, this);
 
 		initWidget(panel);
 	}
 	
 	@Override
-	public void onSessionStateChanged(final SessionStateChangedEvent event) {
-		status.setText(event.getState().toString());
+	public void onSessionStatusChanged(final SessionStatusChangedEvent event) {
+		status.setText(event.getStatus().toString());
 
-		if (event.is(SessionState.disconnected)) {
+		if (event.is(SessionStatus.disconnected)) {
 			image.setText("D");
-		} else if (event.is(SessionState.loggedIn)) {
+		} else if (event.is(SessionStatus.loggedIn)) {
 			image.setText("L");
-		} else if (event.is(SessionState.error)) {
+		} else if (event.is(SessionStatus.error)) {
 			image.setText("E");
 		} else {
 			image.setText("C");
@@ -70,7 +70,7 @@ public class StatusWidget extends Composite implements SessionStateChangedEvent.
 	
 	@UiHandler("image")
 	public void onStatusClicked(final ClickEvent event) {
-		if (!SessionState.isDisconnected(session.getSessionState())) {
+		if (!SessionStatus.isDisconnected(session.getStatus())) {
 			Cookies.removeCookie("emite.cookies.pause");
 			session.logout();
 		}

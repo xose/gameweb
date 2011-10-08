@@ -19,8 +19,8 @@
 
 package es.udc.pfc.gameweb.client.welcome;
 
-import com.calclab.emite.core.client.xmpp.stanzas.Message;
-import com.calclab.emite.core.client.xmpp.stanzas.XmppURI;
+import com.calclab.emite.core.client.stanzas.Message;
+import com.calclab.emite.core.client.stanzas.XmppURI;
 import com.calclab.emite.im.client.chat.Chat;
 import com.calclab.emite.im.client.chat.ChatProperties;
 import com.calclab.emite.im.client.chat.pair.PairChatManagerImpl;

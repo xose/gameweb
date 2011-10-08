@@ -42,7 +42,7 @@ public class TabTitleWidget extends Composite implements PageStateChangedEvent.H
 	}
 
 	@UiHandler("closeButton")
-	protected void onClick(ClickEvent e) {
+	protected void onClick(ClickEvent event) {
 		CloseEvent.fire(this, page);
 	}
 

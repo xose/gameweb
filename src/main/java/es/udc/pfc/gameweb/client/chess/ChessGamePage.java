@@ -23,10 +23,10 @@ import java.util.logging.Logger;
 
 import com.calclab.emite.core.client.events.MessageReceivedEvent;
 import com.calclab.emite.core.client.events.PresenceReceivedEvent;
-import com.calclab.emite.core.client.xmpp.stanzas.Message;
-import com.calclab.emite.core.client.xmpp.stanzas.Presence;
-import com.calclab.emite.im.client.chat.ChatStateChangedEvent;
-import com.calclab.emite.im.client.chat.ChatStates;
+import com.calclab.emite.core.client.stanzas.Message;
+import com.calclab.emite.core.client.stanzas.Presence;
+import com.calclab.emite.im.client.chat.ChatStatus;
+import com.calclab.emite.im.client.events.ChatStatusChangedEvent;
 import com.calclab.emite.xep.muc.client.RoomChat;
 import com.calclab.emite.xep.muc.client.RoomChatManager;
 import com.google.common.base.Joiner;
@@ -46,7 +46,7 @@ import es.udc.pfc.gamelib.chess.ChessRules;
 import es.udc.pfc.gamelib.chess.MiniChessRules;
 import es.udc.pfc.gameweb.client.layout.AbstractPage;
 
-public class ChessGamePage extends AbstractPage implements ChatStateChangedEvent.Handler, MessageReceivedEvent.Handler, PresenceReceivedEvent.Handler, ChessGameView.Presenter {
+public class ChessGamePage extends AbstractPage implements ChatStatusChangedEvent.Handler, MessageReceivedEvent.Handler, PresenceReceivedEvent.Handler, ChessGameView.Presenter {
 
 	private static final Logger log = Logger.getLogger(ChessGamePage.class.getName());
 	private static final Splitter cmdSplitter = Splitter.on(':');
@@ -71,7 +71,7 @@ public class ChessGamePage extends AbstractPage implements ChatStateChangedEvent
 		this.room = room;
 		
 		view.setPresenter(this);
-		room.addChatStateChangedHandler(true, this);
+		room.addChatStatusChangedHandler(true, this);
 		room.addMessageReceivedHandler(this);
 		room.addPresenceReceivedHandler(this);
 	}
@@ -84,12 +84,12 @@ public class ChessGamePage extends AbstractPage implements ChatStateChangedEvent
 	}
 	
 	@Override
-	public void onChatStateChanged(final ChatStateChangedEvent event) {
-		if (ChatStates.isReady(event.getState())) {
+	public void onChatStatusChanged(final ChatStatusChangedEvent event) {
+		if (ChatStatus.ready.equals(event.getStatus())) {
 			log.info("READY!");
 			sendCommand("!board");
 		} else {
-			log.info("NOT READY: "+event.getState());
+			log.info("NOT READY: "+event.getStatus());
 		}
 	}
 

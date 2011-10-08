@@ -19,8 +19,8 @@
 
 package es.udc.pfc.gameweb.client;
 
-import com.calclab.emite.core.client.CoreModule;
-import com.calclab.emite.im.client.ImModule;
+import com.calclab.emite.core.client.EmiteCoreModule;
+import com.calclab.emite.im.client.IMModule;
 import com.calclab.emite.reconnect.client.ReconnectModule;
 import com.calclab.emite.xep.muc.client.MucModule;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -40,8 +40,8 @@ public class GameGinModule extends AbstractGinModule {
 	@Override
 	protected void configure() {
 		// Emite
-		install(new CoreModule());
-		install(new ImModule());
+		install(new EmiteCoreModule());
+		install(new IMModule());
 		install(new MucModule());
 		install(new ReconnectModule());
 
