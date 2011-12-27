@@ -22,10 +22,10 @@ package es.udc.pfc.gameweb.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 
-public class GameWeb implements EntryPoint {
+public final class GameWeb implements EntryPoint {
 
 	@Override
-	public void onModuleLoad() {
+	public final void onModuleLoad() {
 		GWT.create(GameGinjector.class);
 	}
 

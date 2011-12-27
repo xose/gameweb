@@ -19,50 +19,48 @@
 
 package es.udc.pfc.gameweb.client.welcome;
 
-import com.calclab.emite.core.client.stanzas.Message;
-import com.calclab.emite.core.client.stanzas.XmppURI;
-import com.calclab.emite.im.client.chat.Chat;
-import com.calclab.emite.im.client.chat.ChatProperties;
-import com.calclab.emite.im.client.chat.pair.PairChatManagerImpl;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.calclab.emite.core.XmppURI;
+import com.calclab.emite.core.session.XmppSession;
+import com.calclab.emite.core.stanzas.Message;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 import es.udc.pfc.gameweb.client.layout.AbstractPage;
 
-public class WelcomePage extends AbstractPage implements WelcomeView.Presenter {
+public final class WelcomePage extends AbstractPage implements WelcomeView.Presenter {
 
 	private final WelcomeView view;
-	private final PairChatManagerImpl chatManager;
+	private final XmppSession session;
 
 	@Inject
-	public WelcomePage(EventBus eventBus, WelcomeView view, PairChatManagerImpl chatManager) {
+	public WelcomePage(final EventBus eventBus, final WelcomeView view, final XmppSession session) {
 		super(eventBus);
-		
 		super.setPageCanClose(false);
-		super.setPageTitle("Welcome");
-		
-		this.view = view;
-		this.chatManager = chatManager;
+		super.setPageTitle(WelcomeMessages.msg.pageTitle());
+
+		this.view = checkNotNull(view);
+		this.session = checkNotNull(session);
 
 		view.setPresenter(this);
 	}
-	
+
 	@Override
-	public void playChess() {
-		System.out.println("presenter playChess");
-		final Chat chat = chatManager.openChat(new ChatProperties(XmppURI.uri("arbiter@games.localhost")), true);
-		chat.send(new Message("play"));
-		chat.close();
+	public final void play(final String game) {
+		final Message msg = new Message("play:" + game);
+		msg.setTo(XmppURI.uri("games.localhost"));
+		session.send(msg);
 	}
 
 	@Override
-	public boolean willClose() {
+	public final boolean willClose() {
 		return false;
 	}
 
 	@Override
-	public Widget asWidget() {
+	public final Widget asWidget() {
 		return view.asWidget();
 	}
 

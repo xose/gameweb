@@ -21,12 +21,12 @@ package es.udc.pfc.gameweb.client.board;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.ImageElement;
@@ -42,14 +42,18 @@ import es.udc.pfc.gamelib.board.Position;
 
 public abstract class AbstractBoardWidget<P extends Piece> extends Composite implements BoardWidget<P>, ClickHandler {
 	
-	private final Canvas canvas;
-	private final Context2d context;
+	private static final int CELL_WIDTH = 100;
+	private static final int CELL_HEIGHT = 100;
+	
+	@Nullable private final Canvas canvas;
+	@Nullable private final Context2d context;
 	private final Map<Position, String> highlighted;
 
 	@Nullable private Board<P> board;
 
 	protected AbstractBoardWidget() {
-		highlighted = new HashMap<Position, String>();
+		highlighted = Maps.newHashMap();
+		
 		canvas = Canvas.createIfSupported();
 		if (canvas == null) {
 			context = null;
@@ -63,17 +67,17 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		initWidget(canvas);
 	}
 	
-	abstract protected ImageElement getPieceImage(final P piece);
+	abstract protected ImageElement getPieceImage(P piece);
 	
 	@Override
 	public final void setBoard(final Board<P> board) {
 		this.board = checkNotNull(board);
 
-		final int width = board.getNumberOfColumns() * 100;
-		final int height = board.getNumberOfRows() * 100;
+		final int width = board.getNumberOfColumns() * CELL_WIDTH;
+		final int height = board.getNumberOfRows() * CELL_HEIGHT;
 		
-		canvas.setWidth(width + "px");
-		canvas.setHeight(height + "px");
+		//canvas.setWidth(width + "px");
+		//canvas.setHeight(height + "px");
 		canvas.setCoordinateSpaceWidth(width);
 		canvas.setCoordinateSpaceHeight(height);
 
@@ -82,15 +86,15 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 
 	private void fillSquare(final int col, final int row, final String style) {
 		context.setFillStyle(style);
-		context.fillRect((col - 1) * 100, (board.getNumberOfRows() - row) * 100, 100, 100);
+		context.fillRect((col - 1) * CELL_WIDTH, (board.getNumberOfRows() - row) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 	}
 
 	@Override
 	public final void drawBoard() {
 		if (board == null)
 			return;
-
-		context.clearRect(0, 0, board.getNumberOfColumns() * 100, board.getNumberOfRows() * 100);
+		
+		context.clearRect(0, 0, board.getNumberOfColumns() * CELL_WIDTH, board.getNumberOfRows() * CELL_HEIGHT);
 
 		for (int col = 1; col <= board.getNumberOfColumns(); col++) {
 			for (int row = 1; row <= board.getNumberOfRows(); row++) {
@@ -108,7 +112,7 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 			final int col = piece.getPosition().getColumn();
 			final int row = piece.getPosition().getRow();
 
-			context.drawImage(ie, (col - 1) * 100, (board.getNumberOfRows() - row) * 100, 100, 100);
+			context.drawImage(ie, (col - 1) * CELL_WIDTH, (board.getNumberOfRows() - row) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 		}
 	}
 
@@ -117,7 +121,7 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		if (board == null)
 			return;
 		
-		final Position clicked = new Position(1 + event.getX() / 100, board.getNumberOfRows() - event.getY() / 100);
+		final Position clicked = new Position(1 + event.getX() / CELL_WIDTH, board.getNumberOfRows() - event.getY() / CELL_HEIGHT);
 
 		if (board.isValidPosition(clicked)) {
 			fireEvent(new PositionClickedEvent(clicked));

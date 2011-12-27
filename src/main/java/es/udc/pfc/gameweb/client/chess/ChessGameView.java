@@ -29,30 +29,30 @@ import es.udc.pfc.gamelib.chess.ChessMovement;
 
 public interface ChessGameView extends IsWidget {
 
-	public void setPresenter(final Presenter presenter);
+	void setPresenter(Presenter presenter);
 	
-	public void setPlayerColor(final ChessColor color);
+	void setPlayerColor(ChessColor color);
 	
-	public void setActiveColor(final ChessColor color);
+	void setActiveColor(ChessColor color);
 
-	public void setBoard(final ChessBoard board);
+	void setBoard(ChessBoard board);
 	
-	public void updateBoard();
+	void updateBoard();
 
-	public void addMovement(final ChessMovement movement);
+	void addMovement(ChessMovement movement);
 	
-	public void setStatusText(final String text);
+	void setStatusText(String text);
 
-	public void addChatLine(final String text);
+	void addChatLine(String text);
 	
 	public interface Presenter {
-		public void sendChat(final String text);
+		void sendChat(String text);
 
-		public void sendCommand(final String text);
+		void sendCommand(String... cmd);
 
-		public void movePiece(final Position from, final Position to);
+		void movePiece(Position from, Position to);
 		
-		public ImmutableSet<Position> getPossibleMoves(final Position position);
+		ImmutableSet<Position> getPossibleMoves(Position position);
 	}
 
 }

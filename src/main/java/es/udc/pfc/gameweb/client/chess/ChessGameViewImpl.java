@@ -42,7 +42,7 @@ import es.udc.pfc.gamelib.chess.ChessMovement;
 import es.udc.pfc.gamelib.chess.ChessPiece;
 import es.udc.pfc.gameweb.client.board.PositionClickedEvent;
 
-public class ChessGameViewImpl extends Composite implements ChessGameView, PositionClickedEvent.Handler {
+public final class ChessGameViewImpl extends Composite implements ChessGameView, PositionClickedEvent.Handler {
 	
 	@UiTemplate("ChessGameView.ui.xml")
 	protected interface Binder extends UiBinder<Widget, ChessGameViewImpl> {
@@ -62,9 +62,6 @@ public class ChessGameViewImpl extends Composite implements ChessGameView, Posit
 	protected HasText chatBox;
 
 	@UiField
-	protected HasText commandBox;
-
-	@UiField
 	protected HasText response;
 	
 	@Nullable private ChessBoard board;
@@ -80,7 +77,7 @@ public class ChessGameViewImpl extends Composite implements ChessGameView, Posit
 
 	@Override
 	public final void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
+		this.presenter = checkNotNull(presenter);
 	}
 
 	@UiHandler("chatBox")
@@ -90,14 +87,6 @@ public class ChessGameViewImpl extends Composite implements ChessGameView, Posit
 		chatBox.setText("");
 	}
 
-	@UiHandler("commandBox")
-	protected final void onCommandBoxChange(final ChangeEvent event) {
-		presenter.sendCommand(commandBox.getText());
-
-		commandBox.setText("");
-		response.setText("");
-	}
-	
 	@Override
 	public final void setPlayerColor(final ChessColor color) {
 		this.playerColor = checkNotNull(color);
@@ -121,7 +110,7 @@ public class ChessGameViewImpl extends Composite implements ChessGameView, Posit
 	}
 
 	@Override
-	public void addMovement(final ChessMovement movement) {
+	public final void addMovement(final ChessMovement movement) {
 		roomMessages.add(new Label("Movement: "+movement.toString()));
 	}
 	
@@ -131,25 +120,24 @@ public class ChessGameViewImpl extends Composite implements ChessGameView, Posit
 	}
 
 	@Override
-	public void addChatLine(final String text) {
+	public final void addChatLine(final String text) {
 		roomMessages.add(new Label(text));
 	}
 	
 	@Override
-	public void onPositionClicked(final PositionClickedEvent event) {
+	public final void onPositionClicked(final PositionClickedEvent event) {
 		if (!activeColor.equals(playerColor))
 			return;
 		
-		final Position position = event.getPosition();
-		final ChessPiece piece = board.getPieceAt(position);
-		
 		boardWidget.clearHighlights();
 		
+		final Position position = event.getPosition();
 		if (selected != null && presenter.getPossibleMoves(selected).contains(position)) {
 			presenter.movePiece(selected, position);
 			return;
 		}
 		
+		final ChessPiece piece = board.getPieceAt(position);
 		if (piece != null && piece.getColor().equals(playerColor)) {
 			selected = position;
 			

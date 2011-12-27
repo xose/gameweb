@@ -2,41 +2,43 @@ package es.udc.pfc.gameweb.client.layout;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.gwt.dom.client.Style.Unit;
+import java.util.LinkedList;
+
+import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 @Singleton
-public class LayoutViewTabs extends Composite implements LayoutView {
+public class LayoutViewStack extends Composite implements LayoutView {
 
 	private final EventBus eventBus;
-	private final TabLayoutPanel tabPanel;
+
+	private final LinkedList<IsWidget> pages;
+	private final SimpleLayoutPanel current;
 	
 	@Inject
-	public LayoutViewTabs(EventBus eventBus) {
+	public LayoutViewStack(EventBus eventBus) {
 		this.eventBus = checkNotNull(eventBus);
+		this.pages = Lists.newLinkedList();
+		this.current = new SimpleLayoutPanel();
+		current.setHeight("100%");
 		
 		PageAddedEvent.bind(eventBus, this);
 		PageClosedEvent.bind(eventBus, this);
 		
-		tabPanel = new TabLayoutPanel(3, Unit.EM);
-		tabPanel.setHeight("100%");
-		tabPanel.setAnimationDuration(200);
-		
-		initWidget(tabPanel);
+		initWidget(current);
 	}
 	
 	@Override
 	public void onPageAdded(PageAddedEvent event) {
 		final Page page = event.getPage();
 		
-		final TabTitleWidget tabTitle = new TabTitleWidget(eventBus, page);
-		
-		tabPanel.add(page, tabTitle);
-		tabPanel.selectTab(page);
+		pages.add(page);
+		current.setWidget(page);
 	}
 	
 	@Override
@@ -44,7 +46,8 @@ public class LayoutViewTabs extends Composite implements LayoutView {
 		final Page page = event.getPage();
 		
 		if (page.willClose()) {
-			tabPanel.remove(page.asWidget());
+			pages.remove(page);
+			current.setWidget(pages.peek());
 		}
 	}
 

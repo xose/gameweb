@@ -17,5 +17,5 @@ public interface Page extends IsWidget {
 	
 	boolean willClose();
 
-	HandlerRegistration addPageStateChangedHandler(final PageStateChangedEvent.Handler handler);
+	HandlerRegistration addPageStateChangedHandler(PageStateChangedEvent.Handler handler);
 }

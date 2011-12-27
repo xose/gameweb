@@ -19,16 +19,20 @@
 
 package es.udc.pfc.gameweb.client.chess;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.logging.Logger;
 
-import com.calclab.emite.core.client.events.MessageReceivedEvent;
-import com.calclab.emite.core.client.events.PresenceReceivedEvent;
-import com.calclab.emite.core.client.stanzas.Message;
-import com.calclab.emite.core.client.stanzas.Presence;
-import com.calclab.emite.im.client.chat.ChatStatus;
-import com.calclab.emite.im.client.events.ChatStatusChangedEvent;
-import com.calclab.emite.xep.muc.client.RoomChat;
-import com.calclab.emite.xep.muc.client.RoomChatManager;
+import com.calclab.emite.base.util.Platform;
+import com.calclab.emite.base.util.ScheduledAction;
+import com.calclab.emite.core.events.MessageReceivedEvent;
+import com.calclab.emite.core.events.PresenceReceivedEvent;
+import com.calclab.emite.core.stanzas.Message;
+import com.calclab.emite.core.stanzas.Presence;
+import com.calclab.emite.xep.muc.RoomChat;
+import com.calclab.emite.xep.muc.RoomChatManager;
+import com.calclab.emite.xep.muc.RoomInvitation;
+import com.calclab.emite.xep.muc.events.RoomChatChangedEvent;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -39,62 +43,68 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.event.shared.EventBus;
 
 import es.udc.pfc.gamelib.board.Position;
-import es.udc.pfc.gamelib.chess.ChessBoard;
 import es.udc.pfc.gamelib.chess.ChessColor;
 import es.udc.pfc.gamelib.chess.ChessMovement;
-import es.udc.pfc.gamelib.chess.ChessRules;
-import es.udc.pfc.gamelib.chess.MiniChessRules;
+import es.udc.pfc.gamelib.chess.ChessGame;
 import es.udc.pfc.gameweb.client.layout.AbstractPage;
 
-public class ChessGamePage extends AbstractPage implements ChatStatusChangedEvent.Handler, MessageReceivedEvent.Handler, PresenceReceivedEvent.Handler, ChessGameView.Presenter {
+public final class ChessGamePage extends AbstractPage implements RoomChatChangedEvent.Handler, MessageReceivedEvent.Handler, PresenceReceivedEvent.Handler, ChessGameView.Presenter {
 
 	private static final Logger log = Logger.getLogger(ChessGamePage.class.getName());
+	
 	private static final Splitter cmdSplitter = Splitter.on(':');
 	private static final Joiner cmdJoiner = Joiner.on(' ');
 	
-	private ChessBoard board;
-	private final ChessRules rules;
-	
 	private final ChessGameView view;
-	private final RoomChatManager roomManager;
+	private final ChessGame game;
 	private final RoomChat room;
 
 	@Inject
-	public ChessGamePage(final EventBus eventBus, final ChessGameView view, final RoomChatManager roomManager, @Assisted final RoomChat room) {
+	protected ChessGamePage(final EventBus eventBus, final ChessGameView view, final RoomChatManager roomManager, @Assisted final RoomInvitation invite, @Assisted final ChessGame game) {
 		super(eventBus);
+		setPageTitle("Chess");
+		this.game = checkNotNull(game);
 		
-		super.setPageTitle("Chess");
-		
-		this.rules = new MiniChessRules();
-		this.view = view;
-		this.roomManager = roomManager;
-		this.room = room;
-		
+		this.view = checkNotNull(view);
 		view.setPresenter(this);
-		room.addChatStatusChangedHandler(true, this);
+		view.setBoard(game.getBoard());
+		
+		roomManager.addRoomChatChangedHandler(this);
+		room = roomManager.acceptRoomInvitation(invite, null);
 		room.addMessageReceivedHandler(this);
 		room.addPresenceReceivedHandler(this);
+		
+		// TODO: fix this
+		Platform.schedule(100, new ScheduledAction() {
+			@Override
+			public void run() {
+				sendCommand("!ping");
+			}
+		});
 	}
 
 	@Override
-	public boolean willClose() {
-		roomManager.close(room);
+	public final boolean willClose() {
+		room.close(null);
 		
 		return true;
 	}
 	
 	@Override
-	public void onChatStatusChanged(final ChatStatusChangedEvent event) {
-		if (ChatStatus.ready.equals(event.getStatus())) {
+	public final void onRoomChatChanged(final RoomChatChangedEvent event) {
+		if (room != event.getChat())
+			return;
+		
+		if (event.isOpened()) {
 			log.info("READY!");
-			sendCommand("!board");
+			view.updateBoard();
 		} else {
-			log.info("NOT READY: "+event.getStatus());
+			log.info("NOT READY: "+event.getChangeType().toString());
 		}
 	}
-
+	
 	@Override
-	public void onMessageReceived(final MessageReceivedEvent event) {
+	public final void onMessageReceived(final MessageReceivedEvent event) {
 		final Message m = event.getMessage();
 
 		if (m.getBody() == null)
@@ -109,38 +119,26 @@ public class ChessGamePage extends AbstractPage implements ChatStatusChangedEven
 	}
 	
 	@Override
-	public void onPresenceReceived(final PresenceReceivedEvent event) {
+	public final void onPresenceReceived(final PresenceReceivedEvent event) {
 		final Presence p = event.getPresence();
 		view.addChatLine(p.getFrom().getResource() + " - " + (p.getType() != null ? p.getType().toString() : "available"));
 	}
 
-	private void receivedGroupChat(final String from, final String body) {
+	private final void receivedGroupChat(final String from, final String body) {
 		view.addChatLine("<" + from + "> " + body);
 	}
 
-	private void receivedArbiter(final ImmutableList<String> cmd, final boolean priv) {
-		//view.addChatLine("arbiter: " + cmd.toString());
-
-		if (cmd.size() == 2 && cmd.get(0).equals("board")) {
-			board = ChessBoard.fromString(cmd.get(1));
-			rules.setBoard(board);
-			view.setBoard(board);
-		} else if (cmd.size() == 3 && cmd.get(0).equals("move")) {
+	private final void receivedArbiter(final ImmutableList<String> cmd, final boolean priv) {
+		if (cmd.size() == 3 && cmd.get(0).equals("move")) {
 			final Position from = Position.fromString(cmd.get(1));
 			final Position to = Position.fromString(cmd.get(2));
 			
-			for (final ChessMovement movement : rules.getPossibleMovements()) {
-				if (movement.getFrom().equals(from) && movement.getTo().equals(to)) {
-					board.setPieceAt(movement.getTo(), board.setPieceAt(movement.getFrom(), null));
-					view.addMovement(movement);
-					view.setActiveColor(rules.nextTurn());
-					view.updateBoard();
-					break;
-				}
-			}
+			final ChessMovement movement = game.movePiece(from, to);
+			view.addMovement(movement);
+			view.setActiveColor(game.getCurrentTurn());
+			view.updateBoard();
 		} else if (cmd.size() == 2 && cmd.get(0).equals("color")) {
 			final ChessColor color = ChessColor.valueOf(cmd.get(1));
-			log.info("turn: "+color.toString());
 			view.setPlayerColor(color);
 		} else if (priv) {
 			view.setStatusText(cmd.toString());
@@ -150,25 +148,25 @@ public class ChessGamePage extends AbstractPage implements ChatStatusChangedEven
 	// Presenter
 
 	@Override
-	public void sendChat(final String text) {
+	public final void sendChat(final String text) {
 		room.send(new Message(text));
 	}
 
 	@Override
-	public void sendCommand(final String text) {
-		room.sendPrivateMessage(new Message(text), "arbiter");
+	public final void sendCommand(final String... cmd) {
+		room.sendPrivateMessage(new Message(cmdJoiner.join(cmd)), "arbiter");
 	}
 
 	@Override
-	public void movePiece(final Position from, final Position to) {
-		sendCommand(cmdJoiner.join("!move", from, to));
+	public final void movePiece(final Position from, final Position to) {
+		sendCommand("!move", from.toString(), to.toString());
 	}
 
 	@Override
-	public ImmutableSet<Position> getPossibleMoves(final Position position) {
+	public final ImmutableSet<Position> getPossibleMoves(final Position position) {
 		final ImmutableSet.Builder<Position> builder = ImmutableSet.builder();
 		
-		for (final ChessMovement movement : rules.getPossibleMovements()) {
+		for (final ChessMovement movement : game.getPossibleMovements()) {
 			if (movement.getFrom().equals(position)) {
 				builder.add(movement.getTo());
 			}
@@ -178,7 +176,7 @@ public class ChessGamePage extends AbstractPage implements ChatStatusChangedEven
 	}
 
 	@Override
-	public Widget asWidget() {
+	public final Widget asWidget() {
 		return view.asWidget();
 	}
 

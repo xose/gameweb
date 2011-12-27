@@ -19,6 +19,10 @@
 
 package es.udc.pfc.gameweb.client.welcome;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,26 +34,27 @@ import com.google.gwt.user.client.ui.Widget;
 public final class WelcomeViewImpl extends Composite implements WelcomeView {
 
 	@UiTemplate("WelcomeView.ui.xml")
-	interface Binder extends UiBinder<Widget, WelcomeViewImpl> {
+	protected interface Binder extends UiBinder<Widget, WelcomeViewImpl> {
 	}
 	
 	private static final Binder uiBinder = GWT.create(Binder.class);
 
-	private Presenter presenter;
-
+	@Nullable private Presenter presenter;
+	
 	public WelcomeViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
-	@UiHandler("playChessLink")
-	protected final void onClick(final ClickEvent event) {
-		System.out.println("Chess click");
-		presenter.playChess();
+	@UiHandler("playMiniChess")
+	protected final void onMiniChessClick(final ClickEvent event) {
+		if (presenter != null) {
+			presenter.play("minichess");
+		}
 	}
-
+	
 	@Override
 	public final void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
+		this.presenter = checkNotNull(presenter);
 	}
 
 }

@@ -21,47 +21,34 @@ package es.udc.pfc.gameweb.client.layout;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.gwt.resources.client.ImageResource;
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-public class PageStateChangedEvent extends Event<PageStateChangedEvent.Handler> {
+public class PageClosedEvent extends Event<PageClosedEvent.Handler> {
 
 	public interface Handler {
-		void onPageStateChanged(PageStateChangedEvent event);
+		public void onPageClosed(PageClosedEvent event);
 	}
-
+	
 	private static final Type<Handler> TYPE = new Type<Handler>();
 	
-	public static HandlerRegistration bind(EventBus eventBus, Page source, Handler handler) {
-		return eventBus.addHandlerToSource(TYPE, source, handler);
+	public static HandlerRegistration bind(EventBus eventBus, Handler handler) {
+		return eventBus.addHandler(TYPE, handler);
 	}
 	
 	public static void fire(EventBus eventBus, Page page) {
-		eventBus.fireEventFromSource(new PageStateChangedEvent(page), page);
+		eventBus.fireEvent(new PageClosedEvent(page));
 	}
-
+	
 	private final Page page;
 
-	protected PageStateChangedEvent(Page page) {
+	private PageClosedEvent(Page page) {
 		this.page = checkNotNull(page);
 	}
 
 	public Page getPage() {
 		return page;
-	}
-
-	public String getPageTitle() {
-		return page.getPageTitle();
-	}
-
-	public ImageResource getPageIcon() {
-		return page.getPageIcon();
-	}
-
-	public boolean getPageCanClose() {
-		return page.getPageCanClose();
 	}
 
 	@Override
@@ -70,7 +57,8 @@ public class PageStateChangedEvent extends Event<PageStateChangedEvent.Handler> 
 	}
 
 	@Override
-	protected void dispatch(final Handler handler) {
-		handler.onPageStateChanged(this);
+	protected void dispatch(Handler handler) {
+		handler.onPageClosed(this);
 	}
+	
 }

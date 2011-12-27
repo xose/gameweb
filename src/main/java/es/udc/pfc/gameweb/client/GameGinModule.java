@@ -19,10 +19,10 @@
 
 package es.udc.pfc.gameweb.client;
 
-import com.calclab.emite.core.client.EmiteCoreModule;
-import com.calclab.emite.im.client.IMModule;
-import com.calclab.emite.reconnect.client.ReconnectModule;
-import com.calclab.emite.xep.muc.client.MucModule;
+import com.calclab.emite.browser.EmiteBrowserModule;
+import com.calclab.emite.core.EmiteCoreModule;
+import com.calclab.emite.im.EmiteIMModule;
+import com.calclab.emite.xep.muc.MUCModule;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.inject.Singleton;
@@ -31,6 +31,8 @@ import com.google.web.bindery.event.shared.SimpleEventBus;
 
 import es.udc.pfc.gameweb.client.chess.ChessGameView;
 import es.udc.pfc.gameweb.client.chess.ChessGameViewImpl;
+import es.udc.pfc.gameweb.client.layout.LayoutView;
+import es.udc.pfc.gameweb.client.layout.LayoutViewStack;
 import es.udc.pfc.gameweb.client.layout.LayoutViewTabs;
 import es.udc.pfc.gameweb.client.welcome.WelcomeView;
 import es.udc.pfc.gameweb.client.welcome.WelcomeViewImpl;
@@ -41,9 +43,9 @@ public class GameGinModule extends AbstractGinModule {
 	protected void configure() {
 		// Emite
 		install(new EmiteCoreModule());
-		install(new IMModule());
-		install(new MucModule());
-		install(new ReconnectModule());
+		install(new EmiteIMModule());
+		install(new EmiteBrowserModule());
+		install(new MUCModule());
 
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
 		
@@ -55,7 +57,7 @@ public class GameGinModule extends AbstractGinModule {
 		bind(WelcomeView.class).to(WelcomeViewImpl.class);
 		bind(ChessGameView.class).to(ChessGameViewImpl.class);
 		
-		bind(LayoutViewTabs.class).in(Singleton.class);
+		bind(LayoutView.class).to(LayoutViewStack.class).in(Singleton.class);
 
 		// Widgets
 		bind(StatusWidget.class).in(Singleton.class);

@@ -1,14 +1,16 @@
 package es.udc.pfc.gameweb.client;
 
-import com.calclab.emite.xep.muc.client.RoomChat;
-import com.calclab.emite.xep.muc.client.RoomInvitation;
-import com.calclab.emite.xep.muc.client.RoomInvitationReceivedEvent;
-import com.calclab.emite.xep.muc.client.RoomChatManager;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.calclab.emite.xep.muc.RoomChatManager;
+import com.calclab.emite.xep.muc.RoomInvitation;
+import com.calclab.emite.xep.muc.events.RoomInvitationReceivedEvent;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
+import es.udc.pfc.gamelib.chess.MiniChessGame;
 import es.udc.pfc.gameweb.client.layout.PageAddedEvent;
 
 @Singleton
@@ -16,27 +18,24 @@ public class GameWebManager implements RoomInvitationReceivedEvent.Handler {
 	
 	private final EventBus eventBus;
 	private final PageFactory pageFactory;
-	private final RoomChatManager roomManager;
 	
 	@Inject
-	public GameWebManager(EventBus eventBus, MainView mainView, PageFactory pageFactory, RoomChatManager roomManager) {
-		this.eventBus = eventBus;
-		this.pageFactory = pageFactory;
-		this.roomManager = roomManager;
+	public GameWebManager(final EventBus eventBus, final MainView mainView, final PageFactory pageFactory, final RoomChatManager roomManager) {
+		this.eventBus = checkNotNull(eventBus);
+		this.pageFactory = checkNotNull(pageFactory);
 		
 		roomManager.addRoomInvitationReceivedHandler(this);
-		
 		PageAddedEvent.fire(eventBus, pageFactory.getWelcomePage());
-		
 		RootLayoutPanel.get().add(mainView);
 	}
 
 	@Override
-	public void onRoomInvitationReceived(RoomInvitationReceivedEvent event) {
+	public final void onRoomInvitationReceived(final RoomInvitationReceivedEvent event) {
 		final RoomInvitation invitation = event.getRoomInvitation();
-
-		final RoomChat room = roomManager.acceptRoomInvitation(invitation);
-		PageAddedEvent.fire(eventBus, pageFactory.getChessGamePage(room));
+		
+		if ("minichess".equals(invitation.getReason())) {
+			PageAddedEvent.fire(eventBus, pageFactory.getChessGamePage(invitation, new MiniChessGame()));
+		}
 	}
 	
 }

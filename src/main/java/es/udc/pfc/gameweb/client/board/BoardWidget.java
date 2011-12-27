@@ -9,11 +9,11 @@ import es.udc.pfc.gamelib.board.Position;
 
 public interface BoardWidget<P extends Piece> extends IsWidget {
 	
-	public void setBoard(final Board<P> board);
-	public void drawBoard();
+	void setBoard(Board<P> board);
+	void drawBoard();
 	
-	public void clearHighlights();
-	public void highlightPosition(final Position position, final String format);
+	void clearHighlights();
+	void highlightPosition(Position position, String format);
 	
-	public HandlerRegistration addPositionClickedHandler(final PositionClickedEvent.Handler handler);
+	HandlerRegistration addPositionClickedHandler(PositionClickedEvent.Handler handler);
 }

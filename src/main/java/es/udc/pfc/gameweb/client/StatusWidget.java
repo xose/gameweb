@@ -19,9 +19,9 @@
 
 package es.udc.pfc.gameweb.client;
 
-import com.calclab.emite.core.client.events.SessionStatusChangedEvent;
-import com.calclab.emite.core.client.session.SessionStatus;
-import com.calclab.emite.core.client.session.XmppSession;
+import com.calclab.emite.core.events.SessionStatusChangedEvent;
+import com.calclab.emite.core.session.SessionStatus;
+import com.calclab.emite.core.session.XmppSession;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
@@ -48,7 +48,7 @@ public class StatusWidget extends Composite implements SessionStatusChangedEvent
 		panel.add(image);
 		panel.add(status);
 
-		session.addSessionStatusChangedHandler(true, this);
+		session.addSessionStatusChangedHandler(this, true);
 
 		initWidget(panel);
 	}
@@ -57,11 +57,11 @@ public class StatusWidget extends Composite implements SessionStatusChangedEvent
 	public void onSessionStatusChanged(final SessionStatusChangedEvent event) {
 		status.setText(event.getStatus().toString());
 
-		if (event.is(SessionStatus.disconnected)) {
+		if (SessionStatus.disconnected.equals(event.getStatus())) {
 			image.setText("D");
-		} else if (event.is(SessionStatus.loggedIn)) {
+		} else if (SessionStatus.loggedIn.equals(event.getStatus())) {
 			image.setText("L");
-		} else if (event.is(SessionStatus.error)) {
+		} else if (SessionStatus.error.equals(event.getStatus())) {
 			image.setText("E");
 		} else {
 			image.setText("C");

@@ -28,15 +28,15 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import es.udc.pfc.gameweb.client.layout.LayoutViewTabs;
+import es.udc.pfc.gameweb.client.layout.LayoutView;
 
 @Singleton
-public class MainView extends Composite {
+public final class MainView extends Composite {
 
-	private static Binder uiBinder = GWT.create(Binder.class);
-
-	interface Binder extends UiBinder<Widget, MainView> {
+	protected interface Binder extends UiBinder<Widget, MainView> {
 	}
+	
+	private static final Binder uiBinder = GWT.create(Binder.class);
 
 	@UiField
 	AcceptsOneWidget mainPanel;
@@ -45,9 +45,9 @@ public class MainView extends Composite {
 	AcceptsOneWidget statusPanel;
 
 	@Inject
-	public MainView(LayoutViewTabs layoutView, StatusWidget statusWidget) {
+	public MainView(final LayoutView layoutView, final StatusWidget statusWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
-
+		
 		mainPanel.setWidget(layoutView);
 		statusPanel.setWidget(statusWidget);
 	}

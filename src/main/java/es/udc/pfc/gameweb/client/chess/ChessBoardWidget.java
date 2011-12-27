@@ -19,9 +19,7 @@
 
 package es.udc.pfc.gameweb.client.chess;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.ui.Image;
 
@@ -31,24 +29,26 @@ import es.udc.pfc.gameweb.client.chess.pieces.ChessPieces;
 
 public class ChessBoardWidget extends AbstractBoardWidget<ChessPiece> {
 
-	private static final Map<String, ImageElement> pieceImages;
+	private static final ImmutableMap<String, ImageElement> pieceImages;
 
 	static {
-		pieceImages = new HashMap<String, ImageElement>();
+		final ImmutableMap.Builder<String, ImageElement> builder = ImmutableMap.builder();
 		
-		pieceImages.put("N", ImageElement.as(new Image(ChessPieces.INSTANCE.wn().getSafeUri()).getElement()));
-		pieceImages.put("Q", ImageElement.as(new Image(ChessPieces.INSTANCE.wq().getSafeUri()).getElement()));
-		pieceImages.put("K", ImageElement.as(new Image(ChessPieces.INSTANCE.wk().getSafeUri()).getElement()));
-		pieceImages.put("B", ImageElement.as(new Image(ChessPieces.INSTANCE.wb().getSafeUri()).getElement()));
-		pieceImages.put("R", ImageElement.as(new Image(ChessPieces.INSTANCE.wr().getSafeUri()).getElement()));
-		pieceImages.put("P", ImageElement.as(new Image(ChessPieces.INSTANCE.wp().getSafeUri()).getElement()));
+		builder.put("N", ImageElement.as(new Image(ChessPieces.INSTANCE.wn().getSafeUri()).getElement()));
+		builder.put("Q", ImageElement.as(new Image(ChessPieces.INSTANCE.wq().getSafeUri()).getElement()));
+		builder.put("K", ImageElement.as(new Image(ChessPieces.INSTANCE.wk().getSafeUri()).getElement()));
+		builder.put("B", ImageElement.as(new Image(ChessPieces.INSTANCE.wb().getSafeUri()).getElement()));
+		builder.put("R", ImageElement.as(new Image(ChessPieces.INSTANCE.wr().getSafeUri()).getElement()));
+		builder.put("P", ImageElement.as(new Image(ChessPieces.INSTANCE.wp().getSafeUri()).getElement()));
 
-		pieceImages.put("n", ImageElement.as(new Image(ChessPieces.INSTANCE.bn().getSafeUri()).getElement()));
-		pieceImages.put("q", ImageElement.as(new Image(ChessPieces.INSTANCE.bq().getSafeUri()).getElement()));
-		pieceImages.put("k", ImageElement.as(new Image(ChessPieces.INSTANCE.bk().getSafeUri()).getElement()));
-		pieceImages.put("b", ImageElement.as(new Image(ChessPieces.INSTANCE.bb().getSafeUri()).getElement()));
-		pieceImages.put("r", ImageElement.as(new Image(ChessPieces.INSTANCE.br().getSafeUri()).getElement()));
-		pieceImages.put("p", ImageElement.as(new Image(ChessPieces.INSTANCE.bp().getSafeUri()).getElement()));
+		builder.put("n", ImageElement.as(new Image(ChessPieces.INSTANCE.bn().getSafeUri()).getElement()));
+		builder.put("q", ImageElement.as(new Image(ChessPieces.INSTANCE.bq().getSafeUri()).getElement()));
+		builder.put("k", ImageElement.as(new Image(ChessPieces.INSTANCE.bk().getSafeUri()).getElement()));
+		builder.put("b", ImageElement.as(new Image(ChessPieces.INSTANCE.bb().getSafeUri()).getElement()));
+		builder.put("r", ImageElement.as(new Image(ChessPieces.INSTANCE.br().getSafeUri()).getElement()));
+		builder.put("p", ImageElement.as(new Image(ChessPieces.INSTANCE.bp().getSafeUri()).getElement()));
+		
+		pieceImages = builder.build();
 	}
 
 	public ChessBoardWidget() {

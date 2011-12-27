@@ -1,5 +1,7 @@
 package es.udc.pfc.gameweb.client.layout;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.gwt.resources.client.ImageResource;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
@@ -13,7 +15,7 @@ public abstract class AbstractPage implements Page {
 	private boolean canClose = true;
 	
 	protected AbstractPage(final EventBus eventBus) {
-		this.eventBus = eventBus;
+		this.eventBus = checkNotNull(eventBus);
 	}
 
 	@Override
@@ -21,10 +23,10 @@ public abstract class AbstractPage implements Page {
 		return title;
 	}
 	
-	protected final void setPageTitle(String title) {
-		this.title = title;
+	protected final void setPageTitle(final String title) {
+		this.title = checkNotNull(title);
 
-		eventBus.fireEventFromSource(new PageStateChangedEvent(this), this);
+		PageStateChangedEvent.fire(eventBus, this);
 	}
 	
 	@Override
@@ -32,10 +34,10 @@ public abstract class AbstractPage implements Page {
 		return icon;
 	}
 	
-	protected final void setPageIcon(ImageResource icon) {
-		this.icon = icon;
+	protected final void setPageIcon(final ImageResource icon) {
+		this.icon = checkNotNull(icon);
 
-		eventBus.fireEventFromSource(new PageStateChangedEvent(this), this);
+		PageStateChangedEvent.fire(eventBus, this);
 	}
 	
 	@Override
@@ -46,14 +48,14 @@ public abstract class AbstractPage implements Page {
 	protected final void setPageCanClose(boolean canClose) {
 		this.canClose = canClose;
 
-		eventBus.fireEventFromSource(new PageStateChangedEvent(this), this);
+		PageStateChangedEvent.fire(eventBus, this);
 	}
 
 	@Override
 	public final HandlerRegistration addPageStateChangedHandler(final PageStateChangedEvent.Handler handler) {
 		handler.onPageStateChanged(new PageStateChangedEvent(this));
 		
-		return eventBus.addHandlerToSource(PageStateChangedEvent.TYPE, this, handler);
+		return PageStateChangedEvent.bind(eventBus, this, handler);
 	}
 
 }
