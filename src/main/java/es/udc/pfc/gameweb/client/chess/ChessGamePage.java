@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import com.calclab.emite.base.util.Platform;
 import com.calclab.emite.base.util.ScheduledAction;
+import com.calclab.emite.base.xml.XMLPacket;
 import com.calclab.emite.core.events.MessageReceivedEvent;
 import com.calclab.emite.core.events.PresenceReceivedEvent;
 import com.calclab.emite.core.stanzas.Message;
@@ -33,9 +34,6 @@ import com.calclab.emite.xep.muc.RoomChat;
 import com.calclab.emite.xep.muc.RoomChatManager;
 import com.calclab.emite.xep.muc.RoomInvitation;
 import com.calclab.emite.xep.muc.events.RoomChatChangedEvent;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -52,8 +50,7 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 
 	private static final Logger log = Logger.getLogger(ChessGamePage.class.getName());
 	
-	private static final Splitter cmdSplitter = Splitter.on(':');
-	private static final Joiner cmdJoiner = Joiner.on(' ');
+	private static final String XMLNS = "urn:xmpp:gamepfc:chess";
 	
 	private final ChessGameView view;
 	private final ChessGame game;
@@ -78,7 +75,9 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 		Platform.schedule(100, new ScheduledAction() {
 			@Override
 			public void run() {
-				sendCommand("!ping");
+				final Message msg = new Message();
+				msg.addExtension("x", XMLNS).addChild("ping");
+				sendArbiter(msg);
 			}
 		});
 	}
@@ -107,12 +106,13 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	public final void onMessageReceived(final MessageReceivedEvent event) {
 		final Message m = event.getMessage();
 
-		if (m.getBody() == null)
-			return;
+		view.addChatLine("arbiter: " + m.toString());
 		
 		if (m.getFrom().getResource().equals("arbiter")) {
-			final ImmutableList<String> command = ImmutableList.copyOf(cmdSplitter.split(m.getBody()));
-			receivedArbiter(command, Message.Type.chat.equals(m.getType()));
+			final XMLPacket x = m.getExtension("x", XMLNS);
+			if (x != null) {
+				receivedArbiter(x, Message.Type.chat.equals(m.getType()));
+			}
 		} else if (m.getType().equals(Message.Type.groupchat)) {
 			receivedGroupChat(m.getFrom().getResource(), m.getBody());
 		}
@@ -128,20 +128,23 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 		view.addChatLine("<" + from + "> " + body);
 	}
 
-	private final void receivedArbiter(final ImmutableList<String> cmd, final boolean priv) {
-		if (cmd.size() == 3 && cmd.get(0).equals("move")) {
-			final Position from = Position.fromString(cmd.get(1));
-			final Position to = Position.fromString(cmd.get(2));
+	private final void receivedArbiter(final XMLPacket x, final boolean priv) {
+		if (x.hasChild("move")) {
+			final XMLPacket move = x.getFirstChild("move");
+			final Position from = Position.fromString(move.getAttribute("from"));
+			final Position to = Position.fromString(move.getAttribute("to"));
 			
 			final ChessMovement movement = game.movePiece(from, to);
 			view.addMovement(movement);
 			view.setActiveColor(game.getCurrentTurn());
 			view.updateBoard();
-		} else if (cmd.size() == 2 && cmd.get(0).equals("color")) {
-			final ChessColor color = ChessColor.valueOf(cmd.get(1));
+		} else if (x.hasChild("start")) {
+			final XMLPacket start = x.getFirstChild("start");
+			final ChessColor color = ChessColor.valueOf(start.getAttribute("color"));
 			view.setPlayerColor(color);
-		} else if (priv) {
-			view.setStatusText(cmd.toString());
+		} else if (x.hasChild("error")) {
+			final XMLPacket error = x.getFirstChild("error");
+			view.setStatusText(error.getAttribute("status"));
 		}
 	}
 
@@ -151,15 +154,19 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	public final void sendChat(final String text) {
 		room.send(new Message(text));
 	}
-
-	@Override
-	public final void sendCommand(final String... cmd) {
-		room.sendPrivateMessage(new Message(cmdJoiner.join(cmd)), "arbiter");
+	
+	private final void sendArbiter(final Message message) {
+		room.sendPrivateMessage(message, "arbiter");
+		view.addChatLine("command: " + message.toString());
 	}
 
 	@Override
 	public final void movePiece(final Position from, final Position to) {
-		sendCommand("!move", from.toString(), to.toString());
+		final Message msg = new Message();
+		final XMLPacket move = msg.addExtension("x", XMLNS).addChild("move");
+		move.setAttribute("from", from.toString());
+		move.setAttribute("to", to.toString());
+		sendArbiter(msg);
 	}
 
 	@Override

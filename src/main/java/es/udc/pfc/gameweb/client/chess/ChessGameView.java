@@ -48,8 +48,6 @@ public interface ChessGameView extends IsWidget {
 	public interface Presenter {
 		void sendChat(String text);
 
-		void sendCommand(String... cmd);
-
 		void movePiece(Position from, Position to);
 		
 		ImmutableSet<Position> getPossibleMoves(Position position);
