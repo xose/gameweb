@@ -56,6 +56,8 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	private final ChessGame game;
 	private final RoomChat room;
 
+	private ChessColor playerColor;
+	
 	@Inject
 	protected ChessGamePage(final EventBus eventBus, final ChessGameView view, final RoomChatManager roomManager, @Assisted final RoomInvitation invite, @Assisted final ChessGame game) {
 		super(eventBus);
@@ -97,8 +99,6 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 		if (event.isOpened()) {
 			log.info("READY!");
 			view.updateBoard();
-		} else {
-			log.info("NOT READY: "+event.getChangeType().toString());
 		}
 	}
 	
@@ -106,7 +106,7 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	public final void onMessageReceived(final MessageReceivedEvent event) {
 		final Message m = event.getMessage();
 
-		view.addChatLine("arbiter: " + m.toString());
+		//view.addChatLine("arbiter: " + m.toString());
 		
 		if (m.getFrom().getResource().equals("arbiter")) {
 			final XMLPacket x = m.getExtension("x", XMLNS);
@@ -129,6 +129,13 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	}
 
 	private final void receivedArbiter(final XMLPacket x, final boolean priv) {
+		if (x.hasChild("start")) {
+			final XMLPacket start = x.getFirstChild("start");
+			playerColor = ChessColor.valueOf(start.getAttribute("color"));
+			view.setPlayerColor(playerColor);
+			view.setStatusText(ChessMessages.msg.currentTurn(playerColor == game.getCurrentTurn()));
+		}
+		
 		if (x.hasChild("move")) {
 			final XMLPacket move = x.getFirstChild("move");
 			final Position from = Position.fromString(move.getAttribute("from"));
@@ -136,13 +143,24 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 			
 			final ChessMovement movement = game.movePiece(from, to);
 			view.addMovement(movement);
-			view.setActiveColor(game.getCurrentTurn());
 			view.updateBoard();
-		} else if (x.hasChild("start")) {
-			final XMLPacket start = x.getFirstChild("start");
-			final ChessColor color = ChessColor.valueOf(start.getAttribute("color"));
-			view.setPlayerColor(color);
-		} else if (x.hasChild("error")) {
+			if (!game.isFinished()) {
+				view.setActiveColor(game.getCurrentTurn());
+				view.setStatusText(ChessMessages.msg.currentTurn(playerColor == game.getCurrentTurn()));
+			}
+		}
+		
+		if (x.hasChild("winner")) {
+			final XMLPacket finished = x.getFirstChild("winner");
+			if (!game.isFinished()) {
+				game.setWinner(ChessColor.valueOf(finished.getAttribute("color")));
+			}
+			
+			view.setActiveColor(null);
+			view.setStatusText(ChessMessages.msg.winner(playerColor == game.getWinner()));
+		}
+		
+		if (x.hasChild("error")) {
 			final XMLPacket error = x.getFirstChild("error");
 			view.setStatusText(error.getAttribute("status"));
 		}
@@ -157,7 +175,7 @@ public final class ChessGamePage extends AbstractPage implements RoomChatChanged
 	
 	private final void sendArbiter(final Message message) {
 		room.sendPrivateMessage(message, "arbiter");
-		view.addChatLine("command: " + message.toString());
+		//view.addChatLine("command: " + message.toString());
 	}
 
 	@Override

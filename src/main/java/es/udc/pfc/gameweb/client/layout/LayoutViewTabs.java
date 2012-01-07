@@ -23,7 +23,6 @@ public class LayoutViewTabs extends Composite implements LayoutView {
 		PageClosedEvent.bind(eventBus, this);
 		
 		tabPanel = new TabLayoutPanel(3, Unit.EM);
-		tabPanel.setHeight("100%");
 		tabPanel.setAnimationDuration(200);
 		
 		initWidget(tabPanel);

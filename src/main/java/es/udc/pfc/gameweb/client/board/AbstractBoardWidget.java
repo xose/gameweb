@@ -29,22 +29,29 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.RequiresResize;
 
 import es.udc.pfc.gamelib.board.Board;
 import es.udc.pfc.gamelib.board.Piece;
 import es.udc.pfc.gamelib.board.Position;
 
-public abstract class AbstractBoardWidget<P extends Piece> extends Composite implements BoardWidget<P>, ClickHandler {
-	
+public abstract class AbstractBoardWidget<P extends Piece> extends Composite implements BoardWidget<P>, RequiresResize, ClickHandler {
+
 	private static final int CELL_WIDTH = 100;
 	private static final int CELL_HEIGHT = 100;
 	
+	private final LayoutPanel panel;
 	@Nullable private final Canvas canvas;
 	@Nullable private final Context2d context;
 	private final Map<Position, String> highlighted;
@@ -56,35 +63,75 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		
 		canvas = Canvas.createIfSupported();
 		if (canvas == null) {
-			context = null;
-			initWidget(new Label("Canvas not supported"));
-			return;
+			throw new RuntimeException("Canvas not supported");
 		}
-
 		canvas.addClickHandler(this);
 		context = canvas.getContext2d();
-
-		initWidget(canvas);
+		panel = new LayoutPanel();
+		panel.add(canvas);
+		initWidget(panel);
+		
+		Window.addResizeHandler(new ResizeHandler() {
+			@Override
+			public void onResize(ResizeEvent event) {
+				AbstractBoardWidget.this.onResize();
+			}
+		});
 	}
 	
 	abstract protected ImageElement getPieceImage(P piece);
 	
 	@Override
-	public final void setBoard(final Board<P> board) {
-		this.board = checkNotNull(board);
+	protected final void onLoad() {
+		super.onLoad();
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override
+			public void execute() {
+				onResize();
+			}
+		});
+	}
+	
+	@Override
+	public final void onResize() {
+		if (board == null)
+			return;
 
-		final int width = board.getNumberOfColumns() * CELL_WIDTH;
-		final int height = board.getNumberOfRows() * CELL_HEIGHT;
+		final int panelWidth = panel.getOffsetWidth();
+		final int panelHeight = panel.getOffsetHeight();
+
+		final double targetAspectRatio = (double) (board.getNumberOfColumns() * CELL_WIDTH) / (double) (board.getNumberOfRows() * CELL_HEIGHT);
+		final double aspectRatio = (double) panelWidth / (double) panelHeight;
+		if (targetAspectRatio > aspectRatio) {
+			final int widgetHeight = (int) (panelWidth / targetAspectRatio);
+			final int widgetTop = (panelHeight - widgetHeight) / 2;
+			
+			panel.setWidgetLeftRight(canvas, 0, Unit.PX, 0, Unit.PX);
+			panel.setWidgetTopHeight(canvas, widgetTop, Unit.PX, widgetHeight, Unit.PX);
+			canvas.setPixelSize(panelWidth, widgetHeight);
+		} else {
+			final int widgetWidth = (int) (panelHeight * targetAspectRatio);
+			final int widgetLeft = (panelWidth - widgetWidth) / 2;
+			
+			panel.setWidgetTopBottom(canvas, 0, Unit.PX, 0, Unit.PX);
+			panel.setWidgetLeftWidth(canvas, widgetLeft, Unit.PX, widgetWidth, Unit.PX);
+			canvas.setPixelSize(widgetWidth, panelHeight);
+		}
 		
-		//canvas.setWidth(width + "px");
-		//canvas.setHeight(height + "px");
-		canvas.setCoordinateSpaceWidth(width);
-		canvas.setCoordinateSpaceHeight(height);
-
 		drawBoard();
 	}
 
-	private void fillSquare(final int col, final int row, final String style) {
+	@Override
+	public final void setBoard(final Board<P> board) {
+		this.board = checkNotNull(board);
+		
+		canvas.setCoordinateSpaceWidth(board.getNumberOfColumns() * CELL_WIDTH);
+		canvas.setCoordinateSpaceHeight(board.getNumberOfRows() * CELL_HEIGHT);
+		
+		onResize();
+	}
+
+	private final void fillSquare(final int col, final int row, final String style) {
 		context.setFillStyle(style);
 		context.fillRect((col - 1) * CELL_WIDTH, (board.getNumberOfRows() - row) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 	}
@@ -109,19 +156,22 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		for (final P piece : board.getAllPieces()) {
 			final ImageElement ie = getPieceImage(piece);
 
-			final int col = piece.getPosition().getColumn();
-			final int row = piece.getPosition().getRow();
+			final int col = board.getPositionFor(piece).getColumn();
+			final int row = board.getPositionFor(piece).getRow();
 
 			context.drawImage(ie, (col - 1) * CELL_WIDTH, (board.getNumberOfRows() - row) * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
 		}
 	}
 
 	@Override
-	public void onClick(final ClickEvent event) {
+	public final void onClick(final ClickEvent event) {
 		if (board == null)
 			return;
 		
-		final Position clicked = new Position(1 + event.getX() / CELL_WIDTH, board.getNumberOfRows() - event.getY() / CELL_HEIGHT);
+		final int cellw = canvas.getOffsetWidth() / board.getNumberOfColumns();
+		final int cellh = canvas.getOffsetHeight() / board.getNumberOfRows();
+		
+		final Position clicked = new Position(1 + event.getX() / cellw, board.getNumberOfRows() - event.getY() / cellh);
 
 		if (board.isValidPosition(clicked)) {
 			fireEvent(new PositionClickedEvent(clicked));

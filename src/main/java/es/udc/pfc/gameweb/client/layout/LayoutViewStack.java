@@ -6,8 +6,8 @@ import java.util.LinkedList;
 
 import com.google.common.collect.Lists;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -17,15 +17,14 @@ public class LayoutViewStack extends Composite implements LayoutView {
 
 	private final EventBus eventBus;
 
-	private final LinkedList<IsWidget> pages;
-	private final SimpleLayoutPanel current;
+	private final LinkedList<Page> pages;
+	private final SimplePanel current;
 	
 	@Inject
 	public LayoutViewStack(EventBus eventBus) {
 		this.eventBus = checkNotNull(eventBus);
 		this.pages = Lists.newLinkedList();
 		this.current = new SimpleLayoutPanel();
-		current.setHeight("100%");
 		
 		PageAddedEvent.bind(eventBus, this);
 		PageClosedEvent.bind(eventBus, this);

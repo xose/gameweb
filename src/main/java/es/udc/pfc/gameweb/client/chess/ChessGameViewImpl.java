@@ -67,7 +67,7 @@ public final class ChessGameViewImpl extends Composite implements ChessGameView,
 	@Nullable private ChessBoard board;
 	@Nullable private Position selected;
 	@Nullable private ChessColor playerColor;
-	private ChessColor activeColor = ChessColor.WHITE;
+	@Nullable private ChessColor activeColor = ChessColor.WHITE;
 	
 	public ChessGameViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -94,7 +94,7 @@ public final class ChessGameViewImpl extends Composite implements ChessGameView,
 	
 	@Override
 	public final void setActiveColor(final ChessColor color) {
-		this.activeColor = checkNotNull(color);
+		this.activeColor = color;
 	}
 
 	@Override

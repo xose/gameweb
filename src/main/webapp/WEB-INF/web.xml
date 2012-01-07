@@ -7,16 +7,6 @@
 	<display-name>GameWeb</display-name>
 	<description>GWT and XMPP gaming web application</description>
 
-	<servlet>
-		<servlet-name>Palladium</servlet-name>
-		<servlet-class>org.xmpp.palladium.PalladiumServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Palladium</servlet-name>
-		<url-pattern>/http-bind</url-pattern>
-	</servlet-mapping>
-
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>GameWeb.html</welcome-file>
