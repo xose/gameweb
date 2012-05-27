@@ -4,6 +4,6 @@
 	<ui:with field="i18n"
 		type="es.udc.pfc.gameweb.client.welcome.WelcomeMessages" />
 	<g:HTMLPanel>
-		<g:Button ui:field="playMiniChess" text="{i18n.miniChessButton}" />
+		<g:Button ui:field="playMiniChess" text="{i18n.miniChessButton}" styleName="btn" />
 	</g:HTMLPanel>
 </ui:UiBinder>

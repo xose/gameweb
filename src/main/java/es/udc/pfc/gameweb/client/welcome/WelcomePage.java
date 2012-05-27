@@ -49,8 +49,9 @@ public final class WelcomePage extends AbstractPage implements WelcomeView.Prese
 
 	@Override
 	public final void play(final String game) {
-		final Message msg = new Message("play:" + game);
+		final Message msg = new Message();
 		msg.setTo(XmppURI.uri("games.localhost"));
+		msg.addExtension("play", "urn:xmpp:gamepfc").setAttribute("game", game);
 		session.send(msg);
 	}
 

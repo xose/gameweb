@@ -8,8 +8,6 @@
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.i18n.I18N" />
 
-	<inherits name="com.google.gwt.user.theme.clean.Clean" />
-
 	<inherits name='com.calclab.emite.core.EmiteCore' />
 	<inherits name='com.calclab.emite.im.EmiteIM' />
 	<inherits name='com.calclab.emite.browser.EmiteBrowser' />

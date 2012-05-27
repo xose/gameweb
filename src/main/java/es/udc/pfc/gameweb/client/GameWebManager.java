@@ -10,7 +10,7 @@ import com.calclab.emite.xep.muc.RoomInvitation;
 import com.calclab.emite.xep.muc.events.RoomInvitationReceivedEvent;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -32,13 +32,13 @@ public final class GameWebManager implements RoomInvitationReceivedEvent.Handler
 		this.session = checkNotNull(session);
 		
 		roomManager.addRoomInvitationReceivedHandler(this);
-		//PageAddedEvent.fire(eventBus, pageFactory.getWelcomePage());
-		RootLayoutPanel.get().add(mainView);
+		PageAddedEvent.fire(eventBus, pageFactory.getWelcomePage());
+		RootPanel.get().add(mainView);
 		
 		if (!Canvas.isSupported()) {
 			Window.alert("Your browser does not support Canvas. You can't play :(");
 		} else {
-			play("minichess");
+			//play("minichess");
 		}
 	}
 	

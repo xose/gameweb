@@ -29,6 +29,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import es.udc.pfc.gameweb.client.layout.LayoutView;
+import es.udc.pfc.gameweb.client.navbar.NavWidget;
 
 @Singleton
 public final class MainView extends Composite {
@@ -39,17 +40,17 @@ public final class MainView extends Composite {
 	private static final Binder uiBinder = GWT.create(Binder.class);
 
 	@UiField
+	AcceptsOneWidget navPanel;
+	
+	@UiField
 	AcceptsOneWidget mainPanel;
 
-	@UiField
-	AcceptsOneWidget statusPanel;
-
 	@Inject
-	public MainView(final LayoutView layoutView, final StatusWidget statusWidget) {
+	public MainView(final LayoutView layoutView, final NavWidget navWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
+		navPanel.setWidget(navWidget);
 		mainPanel.setWidget(layoutView);
-		statusPanel.setWidget(statusWidget);
 	}
 
 }

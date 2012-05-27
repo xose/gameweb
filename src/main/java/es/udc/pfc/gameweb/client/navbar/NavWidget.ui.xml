@@ -1,8 +1,10 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<g:HTMLPanel>
-		<g:SimplePanel ui:field="navPanel" styleName="navbar navbar-fixed-top" />
-		<g:SimplePanel ui:field="mainPanel" styleName="container" />
+	<g:HTMLPanel styleName="navbar-inner">
+		<div class="container">
+			<div class="brand">GameWeb</div>
+			<g:Label ui:field="status" styleName="navbar-text pull-right" />
+		</div>
 	</g:HTMLPanel>
 </ui:UiBinder> 

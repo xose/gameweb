@@ -3,33 +3,15 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:chess="urn:import:es.udc.pfc.gameweb.client.chess">
 	<ui:with field="i18n" type="es.udc.pfc.gameweb.client.chess.ChessMessages" />
-	<g:DockLayoutPanel unit="PT">
-		<g:center>
-			<g:DockLayoutPanel unit="PT">
-				<g:center>
-					<chess:ChessBoardWidget ui:field="boardWidget" />
-				</g:center>
-				<g:south size="50">
-					<g:Label ui:field="response" horizontalAlignment="ALIGN_CENTER" />
-				</g:south>
-			</g:DockLayoutPanel>
-		</g:center>
-		<g:east size="300">
-			<g:DockLayoutPanel unit="PT">
-				<g:center>
-					<g:VerticalPanel ui:field="roomMessages" />
-				</g:center>
-				<g:south size="20">
-					<g:DockLayoutPanel unit="PT">
-						<g:west size="60">
-							<g:Label text="{i18n.labelMessage}:" horizontalAlignment="ALIGN_RIGHT" />
-						</g:west>
-						<g:center>
-							<g:TextBox ui:field="chatBox" />
-						</g:center>
-					</g:DockLayoutPanel>
-				</g:south>
-			</g:DockLayoutPanel>
-		</g:east>
-	</g:DockLayoutPanel>
+	<g:HTMLPanel styleName="row">
+		<div class="span8">
+			<chess:ChessBoardWidget ui:field="boardWidget" />
+			<g:Label ui:field="response" horizontalAlignment="ALIGN_CENTER" />
+		</div>
+		<div class="span4">
+			<g:VerticalPanel ui:field="roomMessages" />
+			<g:Label text="{i18n.labelMessage}:" horizontalAlignment="ALIGN_RIGHT" />
+			<g:TextBox ui:field="chatBox" />
+		</div>
+	</g:HTMLPanel>
 </ui:UiBinder> 

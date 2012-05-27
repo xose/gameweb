@@ -33,7 +33,7 @@ import es.udc.pfc.gameweb.client.chess.ChessGameView;
 import es.udc.pfc.gameweb.client.chess.ChessGameViewImpl;
 import es.udc.pfc.gameweb.client.layout.LayoutView;
 import es.udc.pfc.gameweb.client.layout.LayoutViewStack;
-import es.udc.pfc.gameweb.client.layout.LayoutViewTabs;
+import es.udc.pfc.gameweb.client.navbar.NavWidget;
 import es.udc.pfc.gameweb.client.welcome.WelcomeView;
 import es.udc.pfc.gameweb.client.welcome.WelcomeViewImpl;
 
@@ -60,7 +60,7 @@ public class GameGinModule extends AbstractGinModule {
 		bind(LayoutView.class).to(LayoutViewStack.class).in(Singleton.class);
 
 		// Widgets
-		bind(StatusWidget.class).in(Singleton.class);
+		bind(NavWidget.class).in(Singleton.class);
 		
 		bind(GameWebManager.class).asEagerSingleton();
 	}

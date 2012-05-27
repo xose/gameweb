@@ -29,29 +29,22 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.RequiresResize;
 
 import es.udc.pfc.gamelib.board.Board;
 import es.udc.pfc.gamelib.board.Piece;
 import es.udc.pfc.gamelib.board.Position;
 
-public abstract class AbstractBoardWidget<P extends Piece> extends Composite implements BoardWidget<P>, RequiresResize, ClickHandler {
+public abstract class AbstractBoardWidget<P extends Piece> extends Composite implements BoardWidget<P>, ClickHandler {
 
 	private static final int CELL_WIDTH = 100;
 	private static final int CELL_HEIGHT = 100;
 	
-	private final LayoutPanel panel;
+	//private final LayoutPanel panel;
 	@Nullable private final Canvas canvas;
 	@Nullable private final Context2d context;
 	private final Map<Position, String> highlighted;
@@ -67,21 +60,22 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		}
 		canvas.addClickHandler(this);
 		context = canvas.getContext2d();
-		panel = new LayoutPanel();
-		panel.add(canvas);
-		initWidget(panel);
+		initWidget(canvas);
+		//panel = new LayoutPanel();
+		//panel.add(canvas);
+		//initWidget(panel);
 		
-		Window.addResizeHandler(new ResizeHandler() {
+		/*Window.addResizeHandler(new ResizeHandler() {
 			@Override
 			public void onResize(ResizeEvent event) {
 				AbstractBoardWidget.this.onResize();
 			}
-		});
+		});*/
 	}
 	
 	abstract protected ImageElement getPieceImage(P piece);
 	
-	@Override
+	/*@Override
 	protected final void onLoad() {
 		super.onLoad();
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
@@ -90,8 +84,9 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 				onResize();
 			}
 		});
-	}
+	}*/
 	
+	/*
 	@Override
 	public final void onResize() {
 		if (board == null)
@@ -120,6 +115,18 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		
 		drawBoard();
 	}
+	*/
+	
+	/*@Override
+	public final void onResize() {
+		if (board == null)
+			return;
+		
+		final double targetAspectRatio = (double) (board.getNumberOfColumns() * CELL_WIDTH) / (double) (board.getNumberOfRows() * CELL_HEIGHT);
+		canvas.setPixelSize(620, (int) (620 / targetAspectRatio));
+		
+		drawBoard();
+	}*/
 
 	@Override
 	public final void setBoard(final Board<P> board) {
@@ -128,7 +135,9 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		canvas.setCoordinateSpaceWidth(board.getNumberOfColumns() * CELL_WIDTH);
 		canvas.setCoordinateSpaceHeight(board.getNumberOfRows() * CELL_HEIGHT);
 		
-		onResize();
+		canvas.setPixelSize(620, 620 / (board.getNumberOfColumns() * board.getNumberOfRows()));
+		
+		//onResize();
 	}
 
 	private final void fillSquare(final int col, final int row, final String style) {

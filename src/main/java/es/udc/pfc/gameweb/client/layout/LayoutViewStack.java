@@ -5,8 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.LinkedList;
 
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,7 +24,7 @@ public class LayoutViewStack extends Composite implements LayoutView {
 	public LayoutViewStack(EventBus eventBus) {
 		this.eventBus = checkNotNull(eventBus);
 		this.pages = Lists.newLinkedList();
-		this.current = new SimpleLayoutPanel();
+		this.current = new SimplePanel();
 		
 		PageAddedEvent.bind(eventBus, this);
 		PageClosedEvent.bind(eventBus, this);
@@ -35,6 +35,8 @@ public class LayoutViewStack extends Composite implements LayoutView {
 	@Override
 	public void onPageAdded(PageAddedEvent event) {
 		final Page page = event.getPage();
+		
+		GWT.log("adding page "+page.getPageTitle());
 		
 		pages.add(page);
 		current.setWidget(page);
