@@ -135,7 +135,7 @@ public abstract class AbstractBoardWidget<P extends Piece> extends Composite imp
 		canvas.setCoordinateSpaceWidth(board.getNumberOfColumns() * CELL_WIDTH);
 		canvas.setCoordinateSpaceHeight(board.getNumberOfRows() * CELL_HEIGHT);
 		
-		canvas.setPixelSize(620, 620 / (board.getNumberOfColumns() * board.getNumberOfRows()));
+		canvas.setPixelSize(620, 620 * board.getNumberOfRows() / board.getNumberOfColumns());
 		
 		//onResize();
 	}
